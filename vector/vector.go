@@ -1,12 +1,16 @@
 package vector
 
-import "math"
+import (
+	"math"
+
+	"github.com/andresvie/gorillatracer/utils"
+)
 
 type Vector struct {
-	X float32
-	Y float32
-	Z float32
-	W float32
+	X utils.REAL
+	Y utils.REAL
+	Z utils.REAL
+	W utils.REAL
 }
 
 func (v *Vector) Add(b *Vector) *Vector {
@@ -17,11 +21,11 @@ func (v *Vector) Negate() *Vector {
 	return v.Scale(-1.0)
 }
 
-func (v *Vector) Scale(factor float32) *Vector {
+func (v *Vector) Scale(factor utils.REAL) *Vector {
 	return &Vector{v.X * factor, v.Y * factor, v.Z * factor, v.W * factor}
 }
 
-func (v *Vector) Dot(b *Vector) float32 {
+func (v *Vector) Dot(b *Vector) utils.REAL {
 	dX := v.X * b.X
 	dY := v.Y * b.Y
 	dZ := v.Z * b.Z
@@ -29,13 +33,13 @@ func (v *Vector) Dot(b *Vector) float32 {
 }
 
 func (v *Vector) Normal() *Vector {
-	len := v.Length()
+	len := utils.REAL(v.Length())
 	return &Vector{v.X / len, v.Y / len, v.Z / len, 1.0}
 }
 
-func (v *Vector) Length() float32 {
+func (v *Vector) Length() utils.REAL {
 	square := float64(v.Dot(v))
-	return float32(math.Sqrt(square))
+	return utils.REAL(math.Sqrt(square))
 }
 
 func (v *Vector) Cross(q *Vector) *Vector {
