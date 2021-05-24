@@ -7,9 +7,10 @@ import (
 )
 
 type Hit struct {
-	Collide          bool
-	Interval         utils.REAL
-	InteceptionPoint *vector.Vector
+	Collide           bool
+	Interval          utils.REAL
+	InterceptionPoint *vector.Vector
+	Normal            *vector.Vector
 }
 type Geometry interface {
 	InterceptRay(r *ray.Ray, depth utils.REAL, depthTesting bool) Hit

@@ -9,6 +9,7 @@ import (
 
 	"github.com/andresvie/gorillatracer/camera"
 	"github.com/andresvie/gorillatracer/geometry"
+	"github.com/andresvie/gorillatracer/light"
 	"github.com/andresvie/gorillatracer/ray"
 	"github.com/andresvie/gorillatracer/utils"
 	"github.com/andresvie/gorillatracer/vector"
@@ -19,9 +20,9 @@ var origin = &vector.Vector{X: 0.0, Y: 0.0, Z: 0.0, W: 0.0}
 func main() {
 	width := 200
 	ratio := 16.0 / 9.0
-	red := &vector.Vector{X: 1.0, Y: 0.0, Z: 0.0, W: 0.0}
 	camera := camera.CreateCamera(*origin, utils.REAL(width), utils.REAL(ratio), math.Pi/4)
-	sphere := &geometry.Sphere{Radius: 0.2, Center: &vector.Vector{X: 0.0, Y: 0.0, Z: 2.0, W: 1}}
+	sphere := &geometry.Sphere{Color: vector.CreateColor(1.0, 0.0, 0.0), Radius: 0.2, Center: &vector.Vector{X: 0.0, Y: 0.0, Z: 2.0, W: 1}}
+	pointOfLight := &light.PointOfLight{Point: origin, Intensity: 0.2}
 	flag.Parse()
 	fmt.Printf("file name %v\n", flag.Arg(0))
 	f, err := os.Create(flag.Arg(0))
@@ -36,11 +37,14 @@ func main() {
 		for j := 0; j < int(camera.Width); j++ {
 			r := camera.CalculatePixelRay(j, i)
 			hit := sphere.InterceptRay(r, utils.REAL(math.Inf(1)), true)
-			color := red
+			color := sphere.Color
+			intensity := utils.REAL(1)
 			if !hit.Collide {
 				color = getColor(r)
+			} else {
+				intensity = pointOfLight.CalculateIntensity(&hit)
 			}
-
+			color = color.Scale(intensity)
 			writeColor(f, color)
 		}
 	}

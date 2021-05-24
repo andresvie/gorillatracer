@@ -11,6 +11,7 @@ import (
 type Sphere struct {
 	Radius utils.REAL
 	Center *vector.Vector
+	Color  *vector.Vector
 }
 
 func (s *Sphere) InterceptRay(r *ray.Ray, depth utils.REAL, depthTesting bool) Hit {
@@ -29,13 +30,15 @@ func (s *Sphere) InterceptRay(r *ray.Ray, depth utils.REAL, depthTesting bool) H
 	t1 := (-b + utils.REAL(math.Sqrt(discriminant))) / (2 * a)
 	if depthTesting && t1 < depth {
 		hit.Collide = true
-		hit.InteceptionPoint = r.PointAt(t1)
+		hit.InterceptionPoint = r.PointAt(t1)
+		hit.Normal = hit.InterceptionPoint.Add(s.Center.Negate()).Normal()
 		return hit
 	}
 	t2 := (-b - utils.REAL(math.Sqrt(discriminant))) / (2 * a)
 	if depthTesting && t2 < depth {
 		hit.Collide = true
-		hit.InteceptionPoint = r.PointAt(t2)
+		hit.InterceptionPoint = r.PointAt(t2)
+		hit.Normal = hit.InterceptionPoint.Add(s.Center.Negate()).Normal()
 	}
 
 	return hit

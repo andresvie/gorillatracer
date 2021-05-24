@@ -13,6 +13,9 @@ type Vector struct {
 	W utils.REAL
 }
 
+func CreateColor(red, green, blue utils.REAL) *Vector {
+	return &Vector{X: red, Y: green, Z: blue}
+}
 func (v *Vector) Add(b *Vector) *Vector {
 	return &Vector{v.X + b.X, v.Y + b.Y, v.Z + b.Z, v.W}
 }
