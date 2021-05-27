@@ -13,6 +13,11 @@ type Vector struct {
 	W utils.REAL
 }
 
+func (v *Vector) Reflect(n *Vector) *Vector {
+	p := n.Scale(2 * v.Dot(n))
+	return p.Add(v.Negate()).Normal()
+}
+
 func CreateColor(red, green, blue utils.REAL) *Vector {
 	return &Vector{X: red, Y: green, Z: blue}
 }
@@ -25,7 +30,7 @@ func (v *Vector) Negate() *Vector {
 }
 
 func (v *Vector) Scale(factor utils.REAL) *Vector {
-	return &Vector{v.X * factor, v.Y * factor, v.Z * factor, v.W * factor}
+	return &Vector{v.X * factor, v.Y * factor, v.Z * factor, v.W}
 }
 
 func (v *Vector) Dot(b *Vector) utils.REAL {

@@ -11,6 +11,8 @@ type Hit struct {
 	Interval          utils.REAL
 	InterceptionPoint *vector.Vector
 	Normal            *vector.Vector
+	View              *vector.Vector
+	Specular          utils.REAL
 }
 type Geometry interface {
 	InterceptRay(r *ray.Ray, depth utils.REAL, depthTesting bool) Hit

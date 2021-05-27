@@ -16,3 +16,7 @@ func (r *Ray) PointAt(t utils.REAL) *vector.Vector {
 	newPoint := r.Origin.Add(scaleVector)
 	return &vector.Vector{X: newPoint.X, Y: newPoint.Y, Z: newPoint.Z, W: 0.0}
 }
+
+func (r *Ray) View() *vector.Vector {
+	return r.Direction.Negate().Normal()
+}

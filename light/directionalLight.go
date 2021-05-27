@@ -1,6 +1,8 @@
 package light
 
 import (
+	"math"
+
 	"github.com/andresvie/gorillatracer/geometry"
 	"github.com/andresvie/gorillatracer/utils"
 	"github.com/andresvie/gorillatracer/vector"
@@ -12,6 +14,9 @@ type DirectionalLight struct {
 }
 
 func (d *DirectionalLight) CalculateIntensity(hit *geometry.Hit) utils.REAL {
-	intensity := d.Direction.Normal().Dot(hit.Normal)
-	return utils.Clamp(intensity, 0, 1) * intensity
+	direction := d.Direction
+	diffuseIntensity := utils.Clamp(direction.Dot(hit.Normal), 0, 1)
+	specularIntensity := utils.Clamp(direction.Reflect(hit.Normal).Dot(hit.View), 0, 1)
+	specularIntensity = utils.REAL(math.Pow(float64(specularIntensity), float64(hit.Specular)))
+	return (diffuseIntensity + specularIntensity) * d.Intensity
 }

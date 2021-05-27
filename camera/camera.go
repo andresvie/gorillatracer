@@ -32,6 +32,6 @@ func (c *Camera) CalculatePixelRay(x, y int) *ray.Ray {
 	ndy := 1 - (2 * v)
 	px := ndx * c.ImageRatio * c.Fov
 	py := ndy * c.Fov
-	direction := vector.Vector{X: px, Y: py, Z: -1.0}
+	direction := vector.Vector{X: px, Y: py, Z: -1.0, W: 1.0}
 	return &ray.Ray{Origin: &c.Origin, Direction: &direction}
 }
