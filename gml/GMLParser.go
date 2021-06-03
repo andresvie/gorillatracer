@@ -108,10 +108,11 @@ func parseSphere(lines []string, lineNumber int) (*geometry.Sphere, error) {
 	var position *vector.Vector = nil
 	var radius utils.REAL = 0
 	var specular utils.REAL = 0
+	var reflection utils.REAL = 0
 	var value interface{}
 	var err error
 	sphereVectorTokens := []string{"color", "center"}
-	sphereValueTokens := []string{"radius", "specular"}
+	sphereValueTokens := []string{"radius", "specular", "reflection"}
 	for _, token := range lines {
 		sphereToken, isToken := getToken(token, sphereVectorTokens)
 		sphereSingularToken, isSingularToken := getToken(token, sphereValueTokens)
@@ -138,6 +139,10 @@ func parseSphere(lines []string, lineNumber int) (*geometry.Sphere, error) {
 			c, _ := value.(utils.REAL)
 			radius = c
 			break
+		case "reflection":
+			c, _ := value.(utils.REAL)
+			reflection = c
+			break
 		case "specular":
 			c, _ := value.(utils.REAL)
 			specular = c
@@ -155,7 +160,7 @@ func parseSphere(lines []string, lineNumber int) (*geometry.Sphere, error) {
 	if radius == 0 {
 		return nil, errors.New(fmt.Sprintf("sphere in the line %d radius is required", lineNumber))
 	}
-	return &geometry.Sphere{Center: position, Color: color, Radius: radius, SpecularFactor: specular}, nil
+	return &geometry.Sphere{Center: position, Color: color, Radius: radius, SpecularFactor: specular, ReflectionFactor: reflection}, nil
 }
 
 func parseReal(line string, lineNumber int) (string, utils.REAL, error) {

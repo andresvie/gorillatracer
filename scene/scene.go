@@ -13,6 +13,8 @@ import (
 	"github.com/andresvie/gorillatracer/vector"
 )
 
+var recursionLimit = 10
+
 type Scene struct {
 	Camera  *camera.Camera
 	Lights  []light.Light
@@ -28,17 +30,48 @@ func (s *Scene) Render(w io.Writer) {
 	for i := 0; i < int(camera.Height); i++ {
 		for j := 0; j < int(camera.Width); j++ {
 			r := camera.CalculatePixelRay(j, i)
-			hit, hitObject := s.closestObject(r, infinity)
-			color := getBackGrounColor(r)
+			hit, color := s.closestObject(r, infinity, nil, recursionLimit)
 			intensity := utils.REAL(1)
 			if hit.Collide {
-				color = hitObject.GetColor()
 				intensity = light.IntegrateLight(s.Lights, s.Objects, &hit)
 			}
 			color = color.Scale(intensity)
 			writeColor(w, color)
 		}
 	}
+}
+
+func writeColor(w io.Writer, color *vector.Vector) {
+	ir := math.Abs(float64(color.X * 255.999))
+	ig := math.Abs(float64(color.Y * 255.999))
+	ib := math.Abs(float64(color.Z * 255.999))
+	fmt.Fprintln(w, int(ir), int(ig), int(ib))
+}
+
+func (s *Scene) closestObject(r *ray.Ray, min utils.REAL, hitObject geometry.Geometry, recursionDepth int) (geometry.Hit, *vector.Vector) {
+	tMin := min
+	var hit geometry.Hit
+	var color *vector.Vector = getBackGrounColor(r)
+	for _, object := range s.Objects {
+		if object == hitObject {
+			continue
+		}
+		newHit := object.InterceptRay(r, tMin, 0.0)
+		if newHit.Collide && newHit.Interval < tMin {
+			hit = newHit
+			tMin = hit.Interval
+			color = hit.Object.GetColor()
+			reflectionFactor := newHit.Object.GetReflectionFactor()
+			if reflectionFactor <= 0 || recursionDepth < 0 {
+				continue
+			}
+			reflectionRay := &ray.Ray{Origin: hit.InterceptionPoint, Direction: r.Direction.Negate().Reflect(hit.Normal).Normal()}
+			_, reflectionColor := s.closestObject(reflectionRay, min, object, recursionDepth-1)
+			newColor := color.Scale(1.0 - reflectionFactor).Add(reflectionColor.Scale(reflectionFactor))
+			color = newColor
+		}
+	}
+	return hit, color
 }
 
 func getBackGrounColor(r *ray.Ray) *vector.Vector {
@@ -49,26 +82,4 @@ func getBackGrounColor(r *ray.Ray) *vector.Vector {
 	whiteColor := white.Scale(1.0 - t)
 	lightBlueColor := lightBlue.Scale(t)
 	return whiteColor.Add(lightBlueColor)
-}
-
-func writeColor(w io.Writer, color *vector.Vector) {
-	ir := math.Abs(float64(color.X * 255.999))
-	ig := math.Abs(float64(color.Y * 255.999))
-	ib := math.Abs(float64(color.Z * 255.999))
-	fmt.Fprintln(w, int(ir), int(ig), int(ib))
-}
-
-func (s *Scene) closestObject(r *ray.Ray, min utils.REAL) (geometry.Hit, geometry.Geometry) {
-	tMin := min
-	var hit geometry.Hit
-	var hitObject geometry.Geometry
-	for _, object := range s.Objects {
-		newHit := object.InterceptRay(r, tMin, 0.0)
-		if newHit.Collide && newHit.Interval < tMin {
-			hit = newHit
-			tMin = hit.Interval
-			hitObject = object
-		}
-	}
-	return hit, hitObject
 }

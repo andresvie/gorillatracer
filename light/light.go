@@ -1,8 +1,6 @@
 package light
 
 import (
-	"fmt"
-
 	"github.com/andresvie/gorillatracer/geometry"
 	"github.com/andresvie/gorillatracer/ray"
 	"github.com/andresvie/gorillatracer/utils"
@@ -36,7 +34,7 @@ func isPixelInTheShadow(r *ray.Ray, maxInterval utils.REAL, objects []geometry.G
 			continue
 		}
 		if hit.Collide {
-			fmt.Printf("currentObjectColor(%v) interval(%v) ShadowTestingColor(%v) ray origin(%v) ray direction(%v)\n", objectHit.Object.GetColor(), hit.Interval, object.GetColor(), r.Origin, r.Direction)
+			//fmt.Printf("currentObjectColor(%v) interval(%v) ShadowTestingColor(%v) ray origin(%v) ray direction(%v)\n", objectHit.Object.GetColor(), hit.Interval, object.GetColor(), r.Origin, r.Direction)
 			return true
 		}
 	}

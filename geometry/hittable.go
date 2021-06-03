@@ -18,4 +18,5 @@ type Hit struct {
 type Geometry interface {
 	InterceptRay(r *ray.Ray, depth utils.REAL, initial utils.REAL) Hit
 	GetColor() *vector.Vector
+	GetReflectionFactor() utils.REAL
 }

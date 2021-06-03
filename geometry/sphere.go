@@ -9,10 +9,11 @@ import (
 )
 
 type Sphere struct {
-	Radius         utils.REAL
-	Center         *vector.Vector
-	Color          *vector.Vector
-	SpecularFactor utils.REAL
+	Radius           utils.REAL
+	Center           *vector.Vector
+	Color            *vector.Vector
+	SpecularFactor   utils.REAL
+	ReflectionFactor utils.REAL
 }
 
 func (s *Sphere) InterceptRay(r *ray.Ray, depth utils.REAL, initial utils.REAL) Hit {
@@ -50,6 +51,10 @@ func (s *Sphere) InterceptRay(r *ray.Ray, depth utils.REAL, initial utils.REAL) 
 		return hit
 	}
 	return hit
+}
+
+func (s *Sphere) GetReflectionFactor() utils.REAL {
+	return s.ReflectionFactor
 }
 
 func (s *Sphere) GetColor() *vector.Vector {
