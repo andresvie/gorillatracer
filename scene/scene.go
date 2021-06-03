@@ -25,7 +25,6 @@ func (s *Scene) Render(w io.Writer) {
 	fmt.Fprintln(w, int(camera.Width), " ", int(camera.Height))
 	fmt.Fprintln(w, 255)
 	infinity := utils.REAL(math.Inf(1))
-	//infinity := utils.REAL(1.0)
 	for i := 0; i < int(camera.Height); i++ {
 		for j := 0; j < int(camera.Width); j++ {
 			r := camera.CalculatePixelRay(j, i)
@@ -34,12 +33,9 @@ func (s *Scene) Render(w io.Writer) {
 			intensity := utils.REAL(1)
 			if hit.Collide {
 				color = hitObject.GetColor()
-				//fmt.Printf("%v\n", color)
-				intensity = light.IntegrateLight(s.Lights, &hit)
-				//fmt.Printf("%v\n", intensity)
+				intensity = light.IntegrateLight(s.Lights, s.Objects, &hit)
 			}
 			color = color.Scale(intensity)
-			//fmt.Printf("%v\n", r.Direction)
 			writeColor(w, color)
 		}
 	}
@@ -67,7 +63,7 @@ func (s *Scene) closestObject(r *ray.Ray, min utils.REAL) (geometry.Hit, geometr
 	var hit geometry.Hit
 	var hitObject geometry.Geometry
 	for _, object := range s.Objects {
-		newHit := object.InterceptRay(r, tMin)
+		newHit := object.InterceptRay(r, tMin, 0.0)
 		if newHit.Collide && newHit.Interval < tMin {
 			hit = newHit
 			tMin = hit.Interval

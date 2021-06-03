@@ -13,8 +13,9 @@ type Hit struct {
 	Normal            *vector.Vector
 	View              *vector.Vector
 	Specular          utils.REAL
+	Object            Geometry
 }
 type Geometry interface {
-	InterceptRay(r *ray.Ray, depth utils.REAL) Hit
+	InterceptRay(r *ray.Ray, depth utils.REAL, initial utils.REAL) Hit
 	GetColor() *vector.Vector
 }

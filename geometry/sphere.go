@@ -1,7 +1,6 @@
 package geometry
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/andresvie/gorillatracer/ray"
@@ -16,7 +15,7 @@ type Sphere struct {
 	SpecularFactor utils.REAL
 }
 
-func (s *Sphere) InterceptRay(r *ray.Ray, depth utils.REAL) Hit {
+func (s *Sphere) InterceptRay(r *ray.Ray, depth utils.REAL, initial utils.REAL) Hit {
 	hit := Hit{Collide: false}
 	dir := r.Direction.Normal()
 	rsq := s.Radius * s.Radius
@@ -38,15 +37,15 @@ func (s *Sphere) InterceptRay(r *ray.Ray, depth utils.REAL) Hit {
 	t := t1
 	if t1 >= 0 && t2 >= 0 {
 		t = utils.REAL(math.Min(float64(t1), float64(t2)))
-		fmt.Printf("min %v %v %v(t) %v(direction) %v\n", t1, t2, t, r.Direction, depth)
 	} else if t1 < 0 {
-		fmt.Printf("t2  %v %v %v(t) %v(direction) %v\n", t1, t2, t, r.Direction, depth)
 		t = t2
 	}
-	if t < depth {
-		fmt.Printf("collide  %v %v %v(t) %v(direction) %v\n", t1, t2, t, r.Direction, depth)
+	if t >= initial && t < depth {
+
 		hit.Collide = true
 		hit.InterceptionPoint = r.PointAt(t)
+		hit.Interval = t
+		hit.Object = s
 		hit.Normal = hit.InterceptionPoint.Add(s.Center.Negate()).Normal()
 		return hit
 	}

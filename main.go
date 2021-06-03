@@ -14,7 +14,7 @@ import (
 var origin = &vector.Vector{X: 0.0, Y: 0.0, Z: 0.0, W: 0.0}
 
 func main() {
-	width := 400
+	width := 800
 	ratio := 16.0 / 9.0
 	shouldShowUsage := len(os.Args) != 3
 	if shouldShowUsage {
