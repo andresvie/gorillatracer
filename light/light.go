@@ -18,6 +18,7 @@ func IntegrateLight(lights []Light, objects []geometry.Geometry, hit *geometry.H
 	for _, light := range lights {
 		r, maxValue := light.CreateShadowRay(hit)
 		if r == nil {
+			intensity += light.CalculateIntensity(hit)
 			continue
 		}
 		if isPixelInTheShadow(r, maxValue, objects, hit) {

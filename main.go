@@ -7,6 +7,7 @@ import (
 
 	"github.com/andresvie/gorillatracer/camera"
 	"github.com/andresvie/gorillatracer/gml"
+	"github.com/andresvie/gorillatracer/light"
 	"github.com/andresvie/gorillatracer/utils"
 	"github.com/andresvie/gorillatracer/vector"
 )
@@ -39,6 +40,7 @@ func main() {
 		return
 	}
 	camera := camera.CreateCamera(*origin, utils.REAL(width), utils.REAL(ratio), math.Pi/4)
+	scene.Lights = append(scene.Lights, &light.AmbientLight{Intensity: 0.1})
 	scene.Camera = camera
 	scene.Render(f)
 }
