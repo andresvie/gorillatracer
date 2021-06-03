@@ -12,7 +12,7 @@ import (
 	"github.com/andresvie/gorillatracer/vector"
 )
 
-var origin = &vector.Vector{X: 0.0, Y: 0.0, Z: 0.0, W: 0.0}
+var origin = &vector.Vector{X: 0.0, Y: 1.0, Z: 4.0, W: 0.0}
 
 func main() {
 	width := 800

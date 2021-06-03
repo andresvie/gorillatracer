@@ -30,12 +30,7 @@ func (s *Scene) Render(w io.Writer) {
 	for i := 0; i < int(camera.Height); i++ {
 		for j := 0; j < int(camera.Width); j++ {
 			r := camera.CalculatePixelRay(j, i)
-			hit, color := s.closestObject(r, infinity, nil, recursionLimit)
-			intensity := utils.REAL(1)
-			if hit.Collide {
-				intensity = light.IntegrateLight(s.Lights, s.Objects, &hit)
-			}
-			color = color.Scale(intensity)
+			color := s.calculateColor(r, infinity, nil, recursionLimit)
 			writeColor(w, color)
 		}
 	}
@@ -48,7 +43,7 @@ func writeColor(w io.Writer, color *vector.Vector) {
 	fmt.Fprintln(w, int(ir), int(ig), int(ib))
 }
 
-func (s *Scene) closestObject(r *ray.Ray, min utils.REAL, hitObject geometry.Geometry, recursionDepth int) (geometry.Hit, *vector.Vector) {
+func (s *Scene) calculateColor(r *ray.Ray, min utils.REAL, hitObject geometry.Geometry, recursionDepth int) *vector.Vector {
 	tMin := min
 	var hit geometry.Hit
 	var color *vector.Vector = getBackGrounColor(r)
@@ -57,21 +52,24 @@ func (s *Scene) closestObject(r *ray.Ray, min utils.REAL, hitObject geometry.Geo
 			continue
 		}
 		newHit := object.InterceptRay(r, tMin, 0.0)
+		intensity := utils.REAL(1)
 		if newHit.Collide && newHit.Interval < tMin {
 			hit = newHit
 			tMin = hit.Interval
 			color = hit.Object.GetColor()
+			intensity = light.IntegrateLight(s.Lights, s.Objects, &hit)
+			color = color.Scale(intensity)
 			reflectionFactor := newHit.Object.GetReflectionFactor()
 			if reflectionFactor <= 0 || recursionDepth < 0 {
 				continue
 			}
 			reflectionRay := &ray.Ray{Origin: hit.InterceptionPoint, Direction: r.Direction.Negate().Reflect(hit.Normal).Normal()}
-			_, reflectionColor := s.closestObject(reflectionRay, min, object, recursionDepth-1)
+			reflectionColor := s.calculateColor(reflectionRay, min, object, recursionDepth-1)
 			newColor := color.Scale(1.0 - reflectionFactor).Add(reflectionColor.Scale(reflectionFactor))
 			color = newColor
 		}
 	}
-	return hit, color
+	return color
 }
 
 func getBackGrounColor(r *ray.Ray) *vector.Vector {
